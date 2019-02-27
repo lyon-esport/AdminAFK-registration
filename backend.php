@@ -100,7 +100,7 @@ function save_apiConfiguration($BDD, $TOORNAMENT)
     $fields = [
         "client_id" => ["type" => "alphanumeric"],
         "client_secret" => ["type" => "alphanumeric"],
-        "api_key" => ["type" => "alphanumeric"],
+        "api_key" => ["type" => "string"],
         "toornament_id" => ["type" => "numeric"],
         "webhook_url" => ["type" => "url"]
     ];
@@ -118,6 +118,9 @@ function save_apiConfiguration($BDD, $TOORNAMENT)
                         break;
                     case "numeric":
                         $check = ctype_digit($_POST[$key]);
+                        break;
+                    case "string":
+                        $check = preg_match_all("/^[0-9a-zA-Z_-]*$/", $_POST[$key]);
                         break;
                     case "url":
                         $check = filter_var($_POST[$key], FILTER_VALIDATE_URL);
@@ -282,7 +285,7 @@ function save_requirement($BDD)
                                 $check = ctype_digit($_POST[$subKey]);
                                 break;
                             case "string":
-                                $check = preg_match_all("/^[0-9a-z _()]*$/", $_POST[$subKey]);
+                                $check = preg_match_all("/^[0-9a-zA-Z _()]*$/", $_POST[$subKey]);
                                 break;
                             case "array":
                                 if(strpos($_POST[$subKey], ',') === false)
