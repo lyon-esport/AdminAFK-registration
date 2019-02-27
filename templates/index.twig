@@ -1,0 +1,346 @@
+{% extends 'base.twig' %}
+{% block body %}
+    <br>
+    <div class="container">
+        <div class="field is-grouped is-grouped-multiline has-addons has-addons-centered">
+            <div class="control">
+                <div class="tags has-addons">
+                    <span class="tag is-dark title is-6">Toornament status</span>
+                    {% if status.toornament_status != 0 %}
+                        <span class="tag is-success title is-6">OK</span>
+                    {% else %}
+                        <span class="tag is-danger title is-6 ">Error</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="control">
+                <div class="tags has-addons">
+                    <span class="tag is-dark title is-6">API configuration</span>
+                    {% if status.api_configuration == 200  %}
+                        <span class="tag is-success title is-6">OK</span>
+                    {% else %}
+                        <span class="tag is-danger title is-6 ">Error {{ status.api_configuration }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="control">
+                <div class="tags has-addons">
+                    <span class="tag is-dark title is-6">Webhook</span>
+                    {% if status.webhook == true  %}
+                        <span class="tag is-success title is-6">OK</span>
+                    {% else %}
+                        <span class="tag is-danger title is-6 ">Error</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+    <div class="container">
+        <div class="field is-grouped is-grouped-multiline has-addons has-addons-centered">
+            <div class="control">
+                <div class="tags has-addons">
+                    {% if info.http_code == 200 %}
+                        <span class="tag is-dark title is-6">{{ info.name }} ({{ info.size }} slots)</span>
+                        <span class="tag is-warning title is-6">{{ info.pending }} pending</span>
+                        <span class="tag is-success title is-6">{{ info.accepted }} accepted</span>
+                        <span class="tag is-danger title is-6">{{ info.refused }} refused</span>
+                    {% else %}
+                        <span class="tag is-dark title is-6">Tournament information : </span>
+                        <span class="tag is-danger title is-6">Error {{ info.http_code }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+
+    <div class="container">
+        <div class="field is-grouped is-grouped-multiline has-addons has-addons-centered">
+            {% if info.registration_enabled == true %}
+                <div class="control">
+                    <div class="tags has-addons">
+                        {% if info.http_code == 200 %}
+                            <span class="tag is-dark title is-6">Registration status :</span>
+                            {% if info.open == true %}
+                                <span class="tag is-success title is-6">Open</span>
+                            {% else %}
+                                <span class="tag is-danger title is-6">Closed</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="tag is-dark title is-6">Tournament information : </span>
+                            <span class="tag is-danger title is-6">Error {{ info.http_code }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if info.registration_opening_datetime != "" %}
+                    <div class="control">
+                        <div class="tags has-addons">
+                            <span class="tag is-dark title is-6">Opening :</span>
+                            <span class="tag is-success title is-6">{{ info.registration_opening_datetime }} (UTC+1)</span>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if info.registration_closing_datetime != "" %}
+                    <div class="control">
+                        <div class="tags has-addons">
+                            <span class="tag is-dark title is-6">Closing :</span>
+                            <span class="tag is-danger title is-6">{{ info.registration_closing_datetime }} (UTC+1)</span>
+                        </div>
+                    </div>
+                {% endif %}
+            {% elseif info.http_code == 200 %}
+                <div class="control">
+                    <div class="tags has-addons">
+                        <span class="tag is-danger title is-6">/!\ Registration is disabled /!\</span>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <br>
+    <br>
+    <div class="container">
+        <article class="message is-info">
+            <div class="message-header">
+                <p>Toornament API configuration</p>
+            </div>
+            <div class="message-body">
+                <form action="backend.php" method="post">
+                    <div class="field has-addons has-addons-centered">
+                        <p class="control has-icons-left has-icons-right">
+                            <input name="client_id" class="input" type="text" placeholder="Client ID" value="{{ api_configuration.client_id }}">
+                            <span class="icon is-small is-left">
+                              <i class="fas fa-user"></i>
+                            </span>
+                        </p>
+                        <p class="control has-icons-left">
+                            <input name="client_secret" class="input" type="text" placeholder="Client secret"value="{{ api_configuration.client_secret }}">
+                            <span class="icon is-small is-left">
+                              <i class="fas fa-lock"></i>
+                            </span>
+                        </p>
+                        <p class="control has-icons-left">
+                            <input name="api_key" class="input" type="text" placeholder="API key"value="{{ api_configuration.api_key }}">
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-key"></i>
+                            </span>
+                        </p>
+                        <p class="control has-icons-left">
+                            <input name="toornament_id" class="input" type="text" placeholder="Toornament ID"value="{{ api_configuration.toornament_id }}">
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-trophy"></i>
+                            </span>
+                        </p>
+                        <p class="control has-icons-left">
+                            <input name="webhook_url" class="input" type="text" placeholder="Webhook URL"value="{{ api_configuration.webhook_url }}">
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-link"></i>
+                            </span>
+                        </p>
+                        <p class="control">
+                            <button id="save" class="button is-success" name="choice" value="save-api_configuration">
+                                <span class="icon is-small">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                                <span>Save</span>
+                            </button>
+                        </p>
+                        <input type="hidden" name="{{ csrf_apiConfiguration.name }}" value="{{ csrf_apiConfiguration.value }}">
+                    </div>
+                </form>
+                <br>
+                {% if api_configuration.client_id is not empty and api_configuration.client_secret is not empty and api_configuration.api_key is not empty %}
+                    <form action="backend.php" method="post">
+                        <div class="container has-text-centered">
+                            <button id="save" class="button is-danger" name="choice" value="purge_webhook">
+                                <span class="icon is-small">
+                                    <i class="far fa-trash-alt"></i>
+                                </span>
+                                <span>Purge webhook</span>
+                            </button>
+                        </div>
+                    </form>
+                {% endif %}
+            </div>
+        </article>
+    </div>
+    <br>
+    <br>
+    <div class="container">
+        <article class="message is-warning">
+            <div class="message-header">
+                <p>Requirements</p>
+            </div>
+            <div class="message-body">
+                <form action="backend.php" method="post">
+                    <div class="container has-text-centered">
+                        <div class="field has-addons has-addons-centered">
+                            <p class="control">
+                                <a class="button is-static">
+                                    Age
+                                </a>
+                            </p>
+                            <p class="control has-icons-left has-icons-right">
+                                <input name="age_value" class="input" type="number" placeholder="Minimum age" value="{{ requirement.0.value }}">
+                                <span class="icon is-small is-left">
+                                  <i class="fas fa-calendar"></i>
+                                </span>
+                            </p>
+                            <p class="control has-icons-left">
+                                <input name="age_match" class="input" type="number" placeholder="Match" value="{{ requirement.0.match }}">
+                                <span class="icon is-small is-left">
+                                  <i class="fas fa-equals"></i>
+                                </span>
+                            </p>
+                            {% if custom_fields.http_code == 200 %}
+                                {% if custom_fields.custom_fields is not empty %}
+                                    <div  class="control has-icons-left">
+                                        <div class="select">
+                                            <select name="age_customField">
+                                                {% if requirement.0.custom_field in custom_fields.custom_fields %}
+                                                    <option>{{ requirement.0.custom_field }}</option>
+                                                {% else %}
+                                                    <option></option>
+                                                {% endif %}
+                                                {% for custom_field in custom_fields.custom_fields %}
+                                                    {% if requirement.0.custom_field != custom_field %}
+                                                        <option>{{ custom_field }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                {% if requirement.0.custom_field in custom_fields.custom_fields %}
+                                                    <option></option>
+                                                {% endif %}
+                                            </select>
+                                        </div>
+                                        <span class="icon is-small is-left">
+                                            <i class="fas fa-key"></i>
+                                        </span>
+                                    </div >
+                                {% else %}
+                                    <p class="control">
+                                        <a class="button is-static">
+                                            No custom fields found
+                                        </a>
+                                    </p>
+                                {% endif %}
+                            {% else %}
+                                <p class="control">
+                                    <a class="button is-static">
+                                        Error {{ custom_field.http_code }}
+                                    </a>
+                                </p>
+                            {% endif %}
+                        </div>
+                        <div class="field has-addons has-addons-centered">
+                            <p class="control">
+                                <a class="button is-static">
+                                    Country
+                                </a>
+                            </p>
+                            <p class="control has-icons-left has-icons-right">
+                                <input name="country_value" class="input" type="text" placeholder="List of countries" value="{{ requirement.1.value }}">
+                                <span class="icon is-small is-left">
+                                  <i class="fas fa-globe"></i>
+                                </span>
+                            </p>
+                            <p class="control has-icons-left">
+                                <input name="country_match" class="input" type="number" placeholder="Match" value="{{ requirement.1.match }}">
+                                <span class="icon is-small is-left">
+                                  <i class="fas fa-equals"></i>
+                                </span>
+                            </p>
+                            {% if custom_fields.http_code == 200 %}
+                                {% if custom_fields.custom_fields is not empty %}
+                                    <div  class="control has-icons-left">
+                                        <div class="select">
+                                            <select name="country_customField">
+                                                {% if requirement.1.custom_field in custom_fields.custom_fields %}
+                                                    <option>{{ requirement.1.custom_field }}</option>
+                                                {% else %}
+                                                    <option></option>
+                                                {% endif %}
+                                                {% for custom_field in custom_fields.custom_fields %}
+                                                    {% if requirement.1.custom_field != custom_field %}
+                                                        <option>{{ custom_field }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                {% if requirement.1.custom_field in custom_fields.custom_fields %}
+                                                    <option></option>
+                                                {% endif %}
+                                            </select>
+                                        </div>
+                                        <span class="icon is-small is-left">
+                                            <i class="fas fa-key"></i>
+                                        </span>
+                                    </div >
+                                {% else %}
+                                    <p class="control">
+                                        <a class="button is-static">
+                                            No custom fields found
+                                        </a>
+                                    </p>
+                                {% endif %}
+                            {% else %}
+                                <p class="control">
+                                    <a class="button is-static">
+                                        Error {{ custom_field.http_code }}
+                                    </a>
+                                </p>
+                            {% endif %}
+                        </div>
+                        <div class="container">
+                            <div class="columns">
+                                <div class="column">
+                                    <div class="field">
+                                        <label class="label">If it matchs ?</label>
+                                        <div class="control has-text-centered">
+                                            <div class="select">
+                                                <select name="match">
+                                                    {% if setting.0.value == "Ignore" %}
+                                                        <option>Ignore</option>
+                                                        <option>Accept</option>
+                                                    {% else %}
+                                                        <option>Accept</option>
+                                                        <option>Ignore</option>
+                                                    {% endif %}
+                                                </select>
+                                            </div>
+                                        </div >
+                                    </div>
+                                </div>
+                                <div class="column">
+                                    <div class="field">
+                                        <label class="label">If it doesn't match ?</label>
+                                        <div class="control has-text-centered">
+                                            <div class="select">
+                                                <select name="no_match">
+                                                    {% if setting.1.value == "Ignore" %}S
+                                                        <option>Ignore</option>
+                                                        <option>Refuse</option>
+                                                    {% else %}
+                                                        <option>Refuse</option>
+                                                        <option>Ignore</option>
+                                                    {% endif %}
+                                                </select>
+                                            </div>
+                                        </div >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="save" class="button is-success" name="choice" value="save-requirements">
+                            <span class="icon is-small">
+                                <i class="fas fa-check"></i>
+                            </span>
+                            <span>Save</span>
+                        </button>
+                        <input type="hidden" name="{{ csrf_requirement.name }}" value="{{ csrf_requirement.value }}">
+                    </div>
+                </form>
+            </div>
+        </article>
+    </div>
+{% endblock %}

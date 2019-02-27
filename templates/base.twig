@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% block headers %}
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>AdminAFK-registration</title>
+        <link rel="icon" type="image/png" href="{{ images_path }}img/glyphicon-192x192.png">
+        <link rel="stylesheet" href="{{ css_path }}css/bulma.min.css">
+        <link rel="stylesheet" href="{{ css_path }}css/custom.css">
+        <script defer src="{{ js_path }}js/main.js"></script>
+        <script defer src="{{ js_path }}js/fontsawesome.js"></script>
+    {% endblock %}
+</head>
+<body>
+<div class="page-wrap">
+    {% block navbar %}
+        <nav class="navbar is-dark">
+            <div class="navbar-brand">
+                <a class="navbar-item" target="blank" href="https://www.lyon-esport.fr/">
+                    <img src="{{ images_path }}img/les_small.png" alt="Logo Lyon e-Sport">&nbsp;Lyon e-Sport
+                </a>
+            </div>
+        </nav>
+        <br>
+    {% endblock %}
+    {% include site_template_path ~ 'messages.twig' with {'entry' : entry} %}
+    {% block body %}
+    {% endblock %}
+</div>
+{% block footer %}
+    <footer class="footer site-footer has-background-dark has-text-white">
+        <div class="content has-text-centered">
+            <p>
+                AdminAFK-registration is published under license <strong class="has-text-white">CeCILL v2.1</strong><a href="https://github.com/lyon-esport/AdminAFk-registration" target="blank"><span class="icon has-text-white"><i class="fab fa-github"></i></span></a><br>
+                Copyright © <strong class="has-text-white"><a class="has-text-white" href="https://www.lyon-esport.fr/" target="blank">Lyon e-Sport <span class="is-inline-block"><img class="image is-24x24" src="{{ images_path }}img/les_transparent.png"></span></a></strong> 2019<br>
+                by Ludovic « -MoNsTeRRR » Ortega <a href="https://twitter.com/MoNsTeRRR_CSGO/" target="blank"><span class="icon has-text-white"><i class="fab fa-twitter"></i></span></a> <a href="https://steamcommunity.com/profiles/76561198111338710" target="blank"><span class="icon has-text-white"><i class="fab fa-steam"></i></span></a>
+            </p>
+        </div>
+    </footer>
+{% endblock %}
+</body>
+</html>

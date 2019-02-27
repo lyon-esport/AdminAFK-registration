@@ -1,0 +1,428 @@
+<?php
+// ----------------------------------------------------------------------------
+// Copyright © Lyon e-Sport, 2019
+//
+// Contributeur(s):
+//     * Ortega Ludovic - ludovic.ortega@lyon-esport.fr
+//
+// Ce logiciel, AdminAFK-registration, est un programme informatique servant à gérer
+// automatiquement les inscriptions des joueurs/équipes en fonction de conditions sur
+// la plateforme toornament.
+//
+// Ce logiciel est régi par la licence CeCILL soumise au droit français et
+// respectant les principes de diffusion des logiciels libres. Vous pouvez
+// utiliser, modifier et/ou redistribuer ce programme sous les conditions
+// de la licence CeCILL telle que diffusée par le CEA, le CNRS et l'INRIA
+// sur le site "http://www.cecill.info".
+//
+// En contrepartie de l'accessibilité au code source et des droits de copie,
+// de modification et de redistribution accordés par cette licence, il n'est
+// offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,
+// seule une responsabilité restreinte pèse sur l'auteur du programme,  le
+// titulaire des droits patrimoniaux et les concédants successifs.
+//
+// A cet égard  l'attention de l'utilisateur est attirée sur les risques
+// associés au chargement,  à l'utilisation,  à la modification et/ou au
+// développement et à la reproduction du logiciel par l'utilisateur étant
+// donné sa spécificité de logiciel libre, qui peut le rendre complexe à
+// manipuler et qui le réserve donc à des développeurs et des professionnels
+// avertis possédant  des  connaissances  informatiques approfondies.  Les
+// utilisateurs sont donc invités à charger  et  tester  l'adéquation  du
+// logiciel à leurs besoins dans des conditions permettant d'assurer la
+// sécurité de leurs systèmes et ou de leurs données et, plus généralement,
+// à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.
+//
+// Le fait que vous puissiez accéder à cet en-tête signifie que vous avez
+// pris connaissance de la licence CeCILL, et que vous en avez accepté les
+// termes.
+// ----------------------------------------------------------------------------
+
+session_start();
+
+use \Project\Bdd;
+require_once 'class/Bdd.php';
+use \Project\Toornament;
+require_once 'class/Toornament.php';
+
+require_once 'functions/csrf.php';
+require_once 'functions/messages.php';
+
+try
+{
+    $BDD = new Bdd('');
+    $toornamentStatus = $BDD->get_toornament();
+    $TOORNAMENT = new Toornament($toornamentStatus);
+}
+catch (Exception $e)
+{
+    create_message([['title' => 'Error !', 'content' => 'An error occurred when processing your request', 'color' => 'error', 'delete' => true, 'container' => true]]);
+    header('Location: index.php');
+    die();
+}
+
+if(isset($_POST['choice']) && !empty($_POST['choice']))
+{
+    if($_POST['choice'] === "save-api_configuration")
+    {
+        save_apiConfiguration($BDD, $TOORNAMENT);
+    }
+    elseif ($_POST['choice'] === "save-requirements")
+    {
+        save_requirement($BDD);
+    }
+    elseif ($_POST['choice'] === "purge_webhook")
+    {
+        purge_webhook($BDD, $TOORNAMENT);
+    }
+    else
+    {
+        create_message([['title' => 'Error !', 'content' => 'An error occurred when processing your request', 'color' => 'error', 'delete' => true, 'container' => true]]);
+        header('Location: index.php');
+        die();
+    }
+}
+else
+{
+    create_message([['title' => 'Error !', 'content' => 'An error occurred when processing your request', 'color' => 'error', 'delete' => true, 'container' => true]]);
+    header('Location: index.php');
+    die();
+}
+
+function save_apiConfiguration($BDD, $TOORNAMENT)
+{
+    if(!check_csrf('csrf_apiConfiguration'))
+    {
+        create_message([['title' => 'Error !', 'content' => 'An error occurred when processing your request', 'color' => 'error', 'delete' => true, 'container' => true]]);
+        header('Location: index.php');
+        die();
+    }
+
+    $fields = [
+        "client_id" => ["type" => "alphanumeric"],
+        "client_secret" => ["type" => "alphanumeric"],
+        "api_key" => ["type" => "alphanumeric"],
+        "toornament_id" => ["type" => "numeric"],
+        "webhook_url" => ["type" => "url"]
+    ];
+
+    try
+    {
+        foreach($fields as $key => $value)
+        {
+            if(isset($_POST[$key]))
+            {
+                switch($fields[$key]["type"])
+                {
+                    case "alphanumeric":
+                        $check = ctype_alnum($_POST[$key]);
+                        break;
+                    case "numeric":
+                        $check = ctype_digit($_POST[$key]);
+                        break;
+                    case "url":
+                        $check = filter_var($_POST[$key], FILTER_VALIDATE_URL);
+                        break;
+                    default:
+                        throw new Exception("An error occurred when processing your request");
+                        break;
+                }
+
+                if(empty($_POST[$key]) || $check)
+                {
+                    $fields[$key]["value"] = $_POST[$key];
+                }
+                else
+                {
+                    throw new Exception($key." is not filled properly");
+                }
+            }
+            else
+            {
+                throw new Exception($key." is not filled");
+            }
+        }
+    }
+    catch(Exception $e)
+    {
+        create_message([['title' => 'Error !', 'content' => $e->getMessage(), 'color' => 'error', 'delete' => true, 'container' => true]]);
+        header('Location: index.php');
+        die();
+    }
+
+    try
+    {
+        $BDD->patch_toornament($fields["client_id"]["value"], $fields["client_secret"]["value"], $fields["api_key"]["value"], $fields["toornament_id"]["value"], $fields["webhook_url"]["value"]);
+        $TOORNAMENT->setToornamentId($fields["toornament_id"]["value"]);
+        $TOORNAMENT->setWebhookUrl($fields["webhook_url"]["value"]);
+    }
+    catch(Exception $e)
+    {
+        create_message([['title' => 'Error !', 'content' => $e->getMessage(), 'color' => 'error', 'delete' => true, 'container' => true]]);
+        header('Location: index.php');
+        die();
+    }
+
+    try
+    {
+        $toornamentWebhook = $TOORNAMENT->get_webhook();
+        $webhook_exist = false;
+        if(count($toornamentWebhook["body"]) > 0)
+        {
+            foreach($toornamentWebhook["body"] as &$webhook)
+            {
+                if($webhook->name === "AdminAFK-registration")
+                {
+                    $webhook_exist = true;
+                    $webhook_id = $webhook->id;
+                    if($webhook->url !== $TOORNAMENT->getWebhookUrl())
+                    {
+                        $webhookUpdated = $TOORNAMENT->patch_webhook($webhook->id);
+                        $webhook_id = $webhookUpdated->id;
+                    }
+                }
+            }
+            if($webhook_exist === false)
+            {
+                $webhookCreated = $TOORNAMENT->post_webhook();
+                $webhook_id = $webhookCreated["body"]->id;
+            }
+        }
+        else
+        {
+            $webhookCreated = $TOORNAMENT->post_webhook();
+            $webhook_id = $webhookCreated["body"]->id;
+        }
+    }
+    catch(Exception $e)
+    {
+        create_message([['title' => 'Error !', 'content' => $e->getMessage()." Webhook failed", 'color' => 'error', 'delete' => true, 'container' => true]]);
+        header('Location: index.php');
+        die();
+    }
+
+    try
+    {
+        $toornamentSubscription = $TOORNAMENT->get_subscription($webhook_id);
+        if(count($toornamentSubscription["body"]) > 0)
+        {
+            $subscription_done["registration.created"] = false;
+            $subscription_done["registration.info_updated"] = false;
+            foreach($toornamentSubscription["body"] as &$subscription)
+            {
+                if($subscription->scope_id === $TOORNAMENT->getToornamentId())
+                {
+                    $subscription_done[$subscription->event_name] = true;
+                }
+            }
+            if($subscription_done["registration.created"] === false)
+            {
+                $TOORNAMENT->post_subscription($webhook_id, "registration.created", "tournament");
+            }
+            if($subscription_done["registration.info_updated"] === false)
+            {
+                $TOORNAMENT->post_subscription($webhook_id, "registration.info_updated", "tournament");
+            }
+        }
+        else
+        {
+            $TOORNAMENT->post_subscription($webhook_id, "registration.created", "tournament");
+            $TOORNAMENT->post_subscription($webhook_id, "registration.info_updated", "tournament");
+        }
+    }
+    catch(Exception $e)
+    {
+        create_message([['title' => 'Error !', 'content' => $e->getMessage()." Subscription failed", 'color' => 'error', 'delete' => true, 'container' => true]]);
+        header('Location: index.php');
+        die();
+    }
+
+    create_message([['title' => 'Success !', 'content' => 'API configuration saved and webhook, subscription created', 'color' => 'success', 'delete' => true, 'container' => true]]);
+    header('Location: index.php');
+    die();
+}
+
+function save_requirement($BDD)
+{
+    if(!check_csrf('csrf_requirement'))
+    {
+        create_message([['title' => 'Error !', 'content' => 'An error occurred when processing your request', 'color' => 'error', 'delete' => true, 'container' => true]]);
+        header('Location: index.php');
+        die();
+    }
+
+    $fields = [
+        "age" => [
+            "age_value" => ["type" => "numeric"],
+            "age_match" => ["type" => "numeric"],
+            "age_customField" => ["type" => "string"]
+        ],
+        "country" => [
+            "country_value" => ["type" => "array"],
+            "country_match" => ["type" => "numeric"],
+            "country_customField" => ["type" => "string"]
+        ]
+    ];
+
+    try
+    {
+        foreach($fields as $key => $value)
+        {
+            foreach($fields[$key] as $subKey => $subValue)
+            {
+                if(isset($_POST[$subKey]))
+                {
+                    if(!empty($_POST[$subKey]))
+                    {
+                        switch($fields[$key][$subKey]["type"])
+                        {
+                            case "alphanumeric":
+                                $check = ctype_alnum($_POST[$subKey]);
+                                break;
+                            case "numeric":
+                                $check = ctype_digit($_POST[$subKey]);
+                                break;
+                            case "string":
+                                $check = preg_match_all("/^[0-9a-z _()]*$/", $_POST[$subKey]);
+                                break;
+                            case "array":
+                                if(strpos($_POST[$subKey], ',') === false)
+                                {
+                                    $check = ctype_alnum($_POST[$subKey]);
+                                }
+                                else
+                                {
+                                    $split = str_replace(' ', '', explode(",", $_POST[$subKey]));
+                                    $check = true;
+                                    for($i=0; $i<count($split);$i++)
+                                    {
+                                        if(!ctype_alnum($split[$i]))
+                                        {
+                                            $check = false;
+                                        }
+                                    }
+                                }
+                                break;
+                            default:
+                                throw new Exception("An error occurred when processing your request");
+                                break;
+                        }
+                    }
+                    if(empty($_POST[$subKey]) || $check)
+                    {
+                        $fields[$key][$subKey]["value"] = $_POST[$subKey];
+                    }
+                    else
+                    {
+                        throw new Exception($key." is not filled properly");
+                    }
+                }
+                else
+                {
+                    throw new Exception($subKey . " is not filled");
+                }
+            }
+        }
+        if(!empty($fields["age"]["age_customField"]["value"]) && !empty($fields["country"]["country_customField"]["value"]))
+        {
+            if($fields["age"]["age_customField"]["value"] === $fields["country"]["country_customField"]["value"])
+            {
+                throw new Exception("age custom field and country custom field must be different");
+            }
+        }
+
+        if(isset($_POST["match"]) && !empty($_POST["match"]))
+        {
+            if($_POST["match"] !== "Ignore" || $_POST["match"] !== "Accept")
+            {
+                $match = $_POST["match"];
+            }
+            else
+            {
+                throw new Exception("match is not filled properly");
+            }
+        }
+        else
+        {
+            throw new Exception("match is not filled");
+        }
+        if(isset($_POST["no_match"]) && !empty($_POST["no_match"]))
+        {
+            if($_POST["no_match"] !== "Ignore" || $_POST["no_match"] !== "Refuse")
+            {
+                $no_match = $_POST["no_match"];
+            }
+            else
+            {
+                throw new Exception("no_match is not filled properly");
+            }
+        }
+        else
+        {
+            throw new Exception("no_match is not filled");
+        }
+    }
+    catch(Exception $e)
+    {
+        create_message([['title' => 'Error !', 'content' => 'An error occurred when processing your request', 'color' => 'error', 'delete' => true, 'container' => true]]);
+        header('Location: index.php');
+        die();
+    }
+
+    try
+    {
+        foreach($fields as $key => $value)
+        {
+            $BDD->patch_requirement($key, $fields[$key][$key.'_value']["value"], $fields[$key][$key.'_match']["value"], $fields[$key][$key.'_customField']["value"], $fields[$key][$key.'_value']["type"]);
+        }
+
+        $BDD->patch_setting("match", $match);
+        $BDD->patch_setting("no_match", $no_match);
+    }
+    catch(Exception $e)
+    {
+        create_message([['title' => 'Error !', 'content' => 'An error occurred when processing your request', 'color' => 'error', 'delete' => true, 'container' => true]]);
+        header('Location: index.php');
+        die();
+    }
+
+    create_message([['title' => 'Success !', 'content' => 'Requirements configuration saved', 'color' => 'success', 'delete' => true, 'container' => true]]);
+    header('Location: index.php');
+    die();
+}
+
+function purge_webhook($BDD, $TOORNAMENT)
+{
+    try
+    {
+        $toornamentWebhook = $TOORNAMENT->get_webhook();
+        if(count($toornamentWebhook["body"]) > 0)
+        {
+            foreach($toornamentWebhook["body"] as &$webhook)
+            {
+                if($webhook->name === "AdminAFK-registration")
+                {
+                    $TOORNAMENT->delete_webhook($webhook->id);
+                    $BDD->delete_webhook_secret();
+                    create_message([['title' => 'Success !', 'content' => "Webhook AdminAFK-registration purged", 'color' => 'success', 'delete' => true, 'container' => true]]);
+                    header('Location: index.php');
+                    die();
+                }
+            }
+            create_message([['title' => 'Success !', 'content' => "None Webhook to purge", 'color' => 'success', 'delete' => true, 'container' => true]]);
+            header('Location: index.php');
+            die();
+        }
+        else
+        {
+            create_message([['title' => 'Success !', 'content' => "None Webhook to purge", 'color' => 'success', 'delete' => true, 'container' => true]]);
+            header('Location: index.php');
+            die();
+        }
+    }
+    catch(Exception $e)
+    {
+        create_message([['title' => 'Error !', 'content' => $e->getMessage()." Webhook failed to delete", 'color' => 'error', 'delete' => true, 'container' => true]]);
+        header('Location: index.php');
+        die();
+    }
+}

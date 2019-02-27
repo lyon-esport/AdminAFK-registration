@@ -1,0 +1,21 @@
+{% block message %}
+    {% for entry in messages %}
+        {% if entry.container == true %}
+            <div class="container">
+        {% endif %}
+        <article class="message {{ entry.color }}">
+            <div class="message-header">
+                <p>{{ entry.title }}</p>
+                {% if entry.delete == true %}
+                    <a class="delete close-message"></a>
+                {% endif %}
+            </div>
+            <div class="message-body">
+                {{ entry.content }}
+            </div>
+        </article>
+        {% if entry.container == true %}
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endblock %}
