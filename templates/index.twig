@@ -128,10 +128,19 @@
                                 <i class="fas fa-key"></i>
                             </span>
                         </p>
+                    </div>
+                    <br>
+                    <div class="field has-addons has-addons-centered">
                         <p class="control has-icons-left">
                             <input name="toornament_id" class="input" type="text" placeholder="Toornament ID"value="{{ api_configuration.toornament_id }}">
                             <span class="icon is-small is-left">
                                 <i class="fas fa-trophy"></i>
+                            </span>
+                        </p>
+                        <p class="control has-icons-left">
+                            <input name="webhook_name" class="input" type="text" placeholder="Webhook name"value="{{ api_configuration.webhook_name }}">
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-tag"></i>
                             </span>
                         </p>
                         <p class="control has-icons-left">
@@ -140,6 +149,9 @@
                                 <i class="fas fa-link"></i>
                             </span>
                         </p>
+                    </div>
+                    <br>
+                    <div class="field has-addons has-addons-centered">
                         <p class="control">
                             <button id="save" class="button is-success" name="choice" value="save-api_configuration">
                                 <span class="icon is-small">
@@ -148,22 +160,19 @@
                                 <span>Save</span>
                             </button>
                         </p>
-                        <input type="hidden" name="{{ csrf_apiConfiguration.name }}" value="{{ csrf_apiConfiguration.value }}">
+                        {% if api_configuration.client_id is not empty and api_configuration.client_secret is not empty and api_configuration.api_key is not empty %}
+                            <p class="control">
+                                <button id="save" class="button is-danger" name="choice" value="purge_webhook">
+                                    <span class="icon is-small">
+                                        <i class="far fa-trash-alt"></i>
+                                    </span>
+                                    <span>Purge webhook</span>
+                                </button>
+                            </p>
+                        {% endif %}
                     </div>
+                    <input type="hidden" name="{{ csrf_apiConfiguration.name }}" value="{{ csrf_apiConfiguration.value }}">
                 </form>
-                <br>
-                {% if api_configuration.client_id is not empty and api_configuration.client_secret is not empty and api_configuration.api_key is not empty %}
-                    <form action="backend.php" method="post">
-                        <div class="container has-text-centered">
-                            <button id="save" class="button is-danger" name="choice" value="purge_webhook">
-                                <span class="icon is-small">
-                                    <i class="far fa-trash-alt"></i>
-                                </span>
-                                <span>Purge webhook</span>
-                            </button>
-                        </div>
-                    </form>
-                {% endif %}
             </div>
         </article>
     </div>
@@ -295,7 +304,7 @@
                             <div class="columns">
                                 <div class="column">
                                     <div class="field">
-                                        <label class="label">If it matchs ?</label>
+                                        <label class="label">If it matches ?</label>
                                         <div class="control has-text-centered">
                                             <div class="select">
                                                 <select name="match">

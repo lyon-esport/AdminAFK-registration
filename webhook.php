@@ -63,7 +63,6 @@ if(isset(getallheaders()['X-Webhook-Secret']))
     try
     {
         $BDD->patch_webhook_secret(getallheaders()['X-Webhook-Secret']);
-        $TOORNAMENT->setWebhookSecret(getallheaders()['X-Webhook-Secret']);
         header('HTTP/1.1 200 OK');
         header('X-Webhook-Secret: '.getallheaders()['X-Webhook-Secret']);
     }
@@ -81,7 +80,7 @@ else if($_SERVER['REQUEST_METHOD'] === 'POST')
     {
         if(isset(getallheaders()['X-Webhook-Signature']))
         {
-            $hash_signature = hash('sha256', $POST_body.$TOORNAMENT->getWebhookSecret());
+            $hash_signature = hash('sha256', $POST_body.$BDD->get_toornament()["webhook_secret"]);
             if($hash_signature !== getallheaders()['X-Webhook-Signature'])
             {
                 throw new Exception("POST : Incorrect X-Webhook-Signature");

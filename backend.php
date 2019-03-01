@@ -102,6 +102,7 @@ function save_apiConfiguration($BDD, $TOORNAMENT)
         "client_secret" => ["type" => "alphanumeric"],
         "api_key" => ["type" => "string"],
         "toornament_id" => ["type" => "numeric"],
+        "webhook_name" => ["type" => "string_30"],
         "webhook_url" => ["type" => "url"]
     ];
 
@@ -120,7 +121,10 @@ function save_apiConfiguration($BDD, $TOORNAMENT)
                         $check = ctype_digit($_POST[$key]);
                         break;
                     case "string":
-                        $check = preg_match_all("/^[0-9a-zA-Z_-]*$/", $_POST[$key]);
+                        $check = preg_match_all("/^[0-9a-zA-Z_\-]*$/", $_POST[$key]);
+                        break;
+                    case "string_30":
+                        $check = preg_match_all("/^[0-9a-zA-Z_\- ]{1,30}$/", $_POST[$key]);
                         break;
                     case "url":
                         $check = filter_var($_POST[$key], FILTER_VALIDATE_URL);
@@ -154,9 +158,8 @@ function save_apiConfiguration($BDD, $TOORNAMENT)
 
     try
     {
-        $BDD->patch_toornament($fields["client_id"]["value"], $fields["client_secret"]["value"], $fields["api_key"]["value"], $fields["toornament_id"]["value"], $fields["webhook_url"]["value"]);
+        $BDD->patch_toornament($fields["client_id"]["value"], $fields["client_secret"]["value"], $fields["api_key"]["value"], $fields["toornament_id"]["value"], $fields["webhook_name"]["value"], $fields["webhook_url"]["value"]);
         $TOORNAMENT->setToornamentId($fields["toornament_id"]["value"]);
-        $TOORNAMENT->setWebhookUrl($fields["webhook_url"]["value"]);
     }
     catch(Exception $e)
     {
@@ -173,26 +176,26 @@ function save_apiConfiguration($BDD, $TOORNAMENT)
         {
             foreach($toornamentWebhook["body"] as &$webhook)
             {
-                if($webhook->name === "AdminAFK-registration")
+                if($webhook->name === $fields["webhook_name"]["value"])
                 {
                     $webhook_exist = true;
                     $webhook_id = $webhook->id;
-                    if($webhook->url !== $TOORNAMENT->getWebhookUrl())
+                    if($webhook->url !== $fields["webhook_url"]["value"])
                     {
-                        $webhookUpdated = $TOORNAMENT->patch_webhook($webhook->id);
+                        $webhookUpdated = $TOORNAMENT->patch_webhook($webhook->id, $fields["webhook_name"]["value"], $fields["webhook_url"]["value"]);
                         $webhook_id = $webhookUpdated->id;
                     }
                 }
             }
             if($webhook_exist === false)
             {
-                $webhookCreated = $TOORNAMENT->post_webhook();
+                $webhookCreated = $TOORNAMENT->post_webhook($fields["webhook_name"]["value"], $fields["webhook_url"]["value"]);
                 $webhook_id = $webhookCreated["body"]->id;
             }
         }
         else
         {
-            $webhookCreated = $TOORNAMENT->post_webhook();
+            $webhookCreated = $TOORNAMENT->post_webhook($fields["webhook_name"]["value"], $fields["webhook_url"]["value"]);
             $webhook_id = $webhookCreated["body"]->id;
         }
     }
@@ -215,6 +218,10 @@ function save_apiConfiguration($BDD, $TOORNAMENT)
                 if($subscription->scope_id === $TOORNAMENT->getToornamentId())
                 {
                     $subscription_done[$subscription->event_name] = true;
+                }
+                else
+                {
+                    $TOORNAMENT->delete_subcription($webhook_id, $subscription->id);
                 }
             }
             if($subscription_done["registration.created"] === false)
@@ -398,26 +405,27 @@ function purge_webhook($BDD, $TOORNAMENT)
     try
     {
         $toornamentWebhook = $TOORNAMENT->get_webhook();
+        $apiConfiguration = $BDD->get_toornament();
         if(count($toornamentWebhook["body"]) > 0)
         {
             foreach($toornamentWebhook["body"] as &$webhook)
             {
-                if($webhook->name === "AdminAFK-registration")
+                if($webhook->name === $apiConfiguration["webhook_name"])
                 {
                     $TOORNAMENT->delete_webhook($webhook->id);
                     $BDD->delete_webhook_secret();
-                    create_message([['title' => 'Success !', 'content' => "Webhook AdminAFK-registration purged", 'color' => 'success', 'delete' => true, 'container' => true]]);
+                    create_message([['title' => 'Success !', 'content' => "Webhook ".$apiConfiguration["webhook_name"]." purged", 'color' => 'success', 'delete' => true, 'container' => true]]);
                     header('Location: index.php');
                     die();
                 }
             }
-            create_message([['title' => 'Success !', 'content' => "None Webhook to purge", 'color' => 'success', 'delete' => true, 'container' => true]]);
+            create_message([['title' => 'Success !', 'content' => "None ".$apiConfiguration["webhook_name"]." Webhook to purge", 'color' => 'success', 'delete' => true, 'container' => true]]);
             header('Location: index.php');
             die();
         }
         else
         {
-            create_message([['title' => 'Success !', 'content' => "None Webhook to purge", 'color' => 'success', 'delete' => true, 'container' => true]]);
+            create_message([['title' => 'Success !', 'content' => "None ".$apiConfiguration["webhook_name"]." Webhook to purge", 'color' => 'success', 'delete' => true, 'container' => true]]);
             header('Location: index.php');
             die();
         }

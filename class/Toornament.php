@@ -48,8 +48,6 @@ class Toornament
     private $client_id;
     private $client_secret;
     private $toornament_id;
-    private $webhook_url;
-    private $webhook_secret;
 
     public function __construct($toornamentInfo)
     {
@@ -57,13 +55,11 @@ class Toornament
         $this->client_id = $toornamentInfo["client_id"];
         $this->client_secret = $toornamentInfo["client_secret"];
         $this->toornament_id = $toornamentInfo["toornament_id"];
-        $this->webhook_url = $toornamentInfo["webhook_url"];
-        $this->webhook_secret = $toornamentInfo["webhook_secret"];
     }
 
-    public function post_webhook()
+    public function post_webhook($webhook_name = "", $webhook_url = "")
     {
-        $body = '{"enabled": true, "name": "AdminAFK-registration", "url": "'.$this->webhook_url.'"}';
+        $body = '{"enabled": true, "name": "'.$webhook_name.'", "url": "'.$webhook_url.'"}';
         return $this->POST('organizer/v2/webhooks', $this->get_token("organizer:registration")["body"]->access_token, $body);
     }
 
@@ -73,9 +69,9 @@ class Toornament
         return $this->POST('organizer/v2/webhooks/'.$webhook_id.'/subscriptions', $this->get_token("organizer:registration")["body"]->access_token, $body);
     }
 
-    public function patch_webhook($webhook_id)
+    public function patch_webhook($webhook_id = "", $webhook_name = "", $webhook_url = "")
     {
-        $body = '{"enabled": true, "name": "AdminAFK-registration", "url": "'.$this->webhook_url.'"}';
+        $body = '{"enabled": true, "name": "'.$webhook_name.'", "url": "'.$webhook_url.'"}';
         return $this->PATCH('organizer/v2/webhooks/'.$webhook_id, $this->get_token("organizer:registration")["body"]->access_token, $body);
     }
 
@@ -91,9 +87,14 @@ class Toornament
         return $this->PATCH('organizer/v2/tournaments/'.$this->toornament_id.'/registrations/'.$registration_id, $this->get_token("organizer:registration")["body"]->access_token, $body);
     }
 
-    public function delete_webhook($webhook_id)
+    public function delete_webhook($webhook_id = "")
     {
         return $this->DELETE('organizer/v2/webhooks/'.$webhook_id, $this->get_token("organizer:registration")["body"]->access_token);
+    }
+
+    public function delete_subcription($webhook_id = "", $subcription_id = "")
+    {
+        return $this->DELETE('organizer/v2/webhooks/'.$webhook_id.'/subscriptions/'.$subcription_id, $this->get_token("organizer:registration")["body"]->access_token);
     }
 
     public function get_webhook()
@@ -168,7 +169,7 @@ class Toornament
         return $this->GET('organizer/v2/tournaments/'.$this->toornament_id, $this->get_token("organizer:view")["body"]->access_token, '');
     }
 
-    public function get_token($token_scope)
+    public function get_token($token_scope = "")
     {
         return $this->GET('oauth/v2/token?grant_type=client_credentials&client_id='.$this->client_id.'&client_secret='.$this->client_secret.'&scope='.$token_scope, '', '');
     }
@@ -299,19 +300,9 @@ class Toornament
         return array("body" => $body, "http_code" => $httpcode);
     }
 
-    public function setToornamentId($toornament_id)
+    public function setToornamentId($toornament_id = "")
     {
         $this->toornament_id = $toornament_id;
-    }
-
-    public function setWebhookUrl($webhook_url)
-    {
-        $this->webhook_url = $webhook_url;
-    }
-
-    public function setWebhookSecret($webhook_secret)
-    {
-        $this->webhook_secret = $webhook_secret;
     }
 
     public function getApiKey()
@@ -333,15 +324,4 @@ class Toornament
     {
         return $this->toornament_id;
     }
-
-    public function getWebhookUrl()
-    {
-        return $this->webhook_url;
-    }
-
-    public function getWebhookSecret()
-    {
-        return $this->webhook_secret;
-    }
-
 }

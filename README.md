@@ -38,7 +38,9 @@ webhook URL, the servers will try to send the data again during the next 24 hour
 1. You need to create an application here : https://developer.toornament.com/applications/
 2. Provide Client ID, Client secret and API key to your application
 3. Provide the Toornament ID (shown in the URL)
-4. Put the full URL to access to webhook.php (Example : http://localhost/webhook.php)
+4. Provide the Webhook name 30 characters max (one webhook name = one tournament, 
+so you have to choose a different name for each tournament)
+5. Put the full URL to access to webhook.php (Example : http://localhost/webhook.php)
 
 #### Requirements
 

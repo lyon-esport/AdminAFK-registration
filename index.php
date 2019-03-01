@@ -84,7 +84,7 @@ try
     {
         foreach($toornamentWebhook["body"] as &$webhook)
         {
-            if($webhook->name === "AdminAFK-registration" && $webhook->url === $TOORNAMENT->getWebhookUrl() && $webhook->enabled === true)
+            if($webhook->name === $api_configuration["webhook_name"] && $webhook->url === $api_configuration["webhook_url"] && $webhook->enabled === true)
             {
                 $toornamentSubscription = $TOORNAMENT->get_subscription($webhook->id);
                 foreach($toornamentSubscription["body"] as &$subscription)

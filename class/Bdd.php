@@ -62,7 +62,7 @@ class Bdd
     public function get_toornament()
     {
         $stmt = $this->BDD->prepare('
-                                              SELECT api_key, client_id, client_secret, toornament_id, webhook_url, webhook_secret 
+                                              SELECT api_key, client_id, client_secret, toornament_id, webhook_name, webhook_url, webhook_secret 
                                               FROM toornament 
                                               WHERE id = 1
                                               ');
@@ -72,18 +72,18 @@ class Bdd
         return $result[0];
     }
 
-    public function patch_toornament($client_id, $client_secret, $api_key, $toornament_id, $webhook_url)
+    public function patch_toornament($client_id = "", $client_secret = "", $api_key = "", $toornament_id = "", $webhook_name = "", $webhook_url = "")
     {
         $stmt = $this->BDD->prepare('
                                               UPDATE toornament 
-                                              SET api_key = :api_key, client_id = :client_id, client_secret = :client_secret, toornament_id = :toornament_id, webhook_url = :webhook_url 
+                                              SET api_key = :api_key, client_id = :client_id, client_secret = :client_secret, toornament_id = :toornament_id, webhook_name = :webhook_name, webhook_url = :webhook_url 
                                               WHERE id = 1
                                               ');
-        $stmt->execute(array(':api_key' => $api_key, ':client_id' => $client_id, ':client_secret' => $client_secret, ':toornament_id' => $toornament_id, ':webhook_url' => $webhook_url));
+        $stmt->execute(array(':api_key' => $api_key, ':client_id' => $client_id, ':client_secret' => $client_secret, ':toornament_id' => $toornament_id, ':webhook_name' => $webhook_name, ':webhook_url' => $webhook_url));
         $stmt->closeCursor();
     }
 
-    public function patch_webhook_secret($webhook_secret)
+    public function patch_webhook_secret($webhook_secret = "")
     {
         $stmt = $this->BDD->prepare('
                                               UPDATE toornament 
@@ -116,7 +116,7 @@ class Bdd
         return $result;
     }
 
-    public function patch_requirement($name, $value, $match, $custom_field, $type)
+    public function patch_requirement($name = "", $value = "", $match = "", $custom_field = "", $type = "")
     {
         $stmt = $this->BDD->prepare('
                                                 UPDATE requirement 

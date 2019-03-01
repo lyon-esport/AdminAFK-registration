@@ -54,6 +54,7 @@ else
                                         client_id    VARCHAR( 255 ),
                                         client_secret  VARCHAR( 255 ),
                                         toornament_id     VARCHAR( 255 ),
+                                        webhook_name     VARCHAR( 255 ),
                                         webhook_url     VARCHAR( 255 ),
                                         webhook_secret     VARCHAR( 255 )
                                         );');
@@ -62,10 +63,10 @@ else
 
         $stmt = $BDD->prepare('
                                         INSERT INTO toornament
-                                        (api_key, client_id, client_secret, toornament_id, webhook_url)
+                                        (api_key, client_id, client_secret, toornament_id, webhook_url, webhook_name, webhook_secret)
                                         VALUES
-                                        (:api_key, :client_id, :client_secret, :toornament_id, :webhook_url)');
-        $stmt->execute(array(":api_key" => "", ":client_id" => "", ":client_secret" => "", ":toornament_id" => "", ":webhook_url" => ""));
+                                        (:api_key, :client_id, :client_secret, :toornament_id, :webhook_name, :webhook_url, :webhook_secret)');
+        $stmt->execute(array(":api_key" => "", ":client_id" => "", ":client_secret" => "", ":toornament_id" => "", ":webhook_name" => "", ":webhook_url" => "", ":webhook_secret" => ""));
         $stmt->closeCursor();
 
         $stmt = $BDD->prepare('
