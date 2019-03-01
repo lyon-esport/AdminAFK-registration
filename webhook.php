@@ -83,12 +83,12 @@ else if($_SERVER['REQUEST_METHOD'] === 'POST')
             $hash_signature = hash('sha256', $POST_body.$BDD->get_toornament()["webhook_secret"]);
             if($hash_signature !== getallheaders()['X-Webhook-Signature'])
             {
-                throw new Exception("POST : Incorrect X-Webhook-Signature");
+                throw new Exception("Incorrect X-Webhook-Signature");
             }
         }
         else
         {
-            throw new Exception("POST : No X-Webhook-Signature");
+            throw new Exception("No X-Webhook-Signature");
         }
 
         $webhook = json_decode($POST_body);
@@ -99,7 +99,7 @@ else if($_SERVER['REQUEST_METHOD'] === 'POST')
         }
         else
         {
-            throw new Exception("POST : Incorrect JSON registration");
+            throw new Exception("Incorrect JSON registration");
         }
 
         $tournament = $TOORNAMENT->get_tournament_info()["body"];
