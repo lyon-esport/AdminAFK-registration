@@ -169,7 +169,7 @@ else if($_SERVER['REQUEST_METHOD'] === 'POST')
             {
                 $all_check = $check["country"] ? $country_match["status"] : true;
             }
-            log_to_file("OK");
+
             $status = $all_check ? $match : $no_match;
 
             switch($status)
@@ -183,6 +183,8 @@ else if($_SERVER['REQUEST_METHOD'] === 'POST')
                 case "ignored":
                     break;
             }
+
+            log_to_file("POST : ".$registration->name." -> ".$status);
         }
     }
     catch(Exception $e)
