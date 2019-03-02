@@ -71,8 +71,7 @@ else
 
         $stmt = $BDD->prepare('
                                         CREATE TABLE IF NOT EXISTS requirement ( 
-                                        id                INTEGER         PRIMARY KEY AUTOINCREMENT,
-                                        name     VARCHAR( 255 ),
+                                        name     VARCHAR( 255 ) PRIMARY KEY,
                                         value     VARCHAR( 1000 ),
                                         match    VARCHAR( 255 ),
                                         custom_field  VARCHAR( 255 ),
@@ -93,9 +92,8 @@ else
         $stmt->closeCursor();
 
         $stmt = $BDD->prepare('
-                                        CREATE TABLE IF NOT EXISTS setting ( 
-                                        id                INTEGER         PRIMARY KEY AUTOINCREMENT,
-                                        name     VARCHAR( 255 ),
+                                        CREATE TABLE IF NOT EXISTS setting (
+                                        name     VARCHAR( 255 ) PRIMARY KEY,
                                         value    VARCHAR( 255 ),
                                         UNIQUE(name)
                                         );');

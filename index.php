@@ -212,6 +212,7 @@ echo $twig->render('index.twig', array(
     'api_configuration' => $api_configuration,
     'requirement' => $requirement,
     'setting' => $setting,
+    'csrf_registration' => new_crsf('csrf_registration'),
     'csrf_apiConfiguration' => new_crsf('csrf_apiConfiguration'),
     'csrf_requirement' => new_crsf('csrf_requirement')
 ));

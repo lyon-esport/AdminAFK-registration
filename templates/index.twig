@@ -56,7 +56,6 @@
     </div>
     <br>
     <br>
-
     <div class="container">
         <div class="field is-grouped is-grouped-multiline has-addons has-addons-centered">
             {% if info.registration_enabled == true %}
@@ -102,6 +101,21 @@
     </div>
     <br>
     <br>
+    {% if info.pending >= 1 %}
+        <div class="container has-text-centered">
+            <form action="backend.php" method="post">
+                <button class="button is-warning is-medium" name="choice" value="check-registration">
+                    <span class="icon is-small">
+                        <i class="far fa-clock"></i>
+                    </span>
+                    <span>Check {{ info.pending }} pending registrations</span>
+                </button>
+                <input type="hidden" name="{{ csrf_registration.name }}" value="{{ csrf_registration.value }}">
+            </form>
+        </div>
+        <br>
+        <br>
+    {% endif %}
     <div class="container">
         <article class="message is-info">
             <div class="message-header">
@@ -153,7 +167,7 @@
                     <br>
                     <div class="field has-addons has-addons-centered">
                         <p class="control">
-                            <button id="save" class="button is-success" name="choice" value="save-api_configuration">
+                            <button class="button is-success" name="choice" value="save-api_configuration">
                                 <span class="icon is-small">
                                     <i class="fas fa-check"></i>
                                 </span>
@@ -162,7 +176,7 @@
                         </p>
                         {% if api_configuration.client_id is not empty and api_configuration.client_secret is not empty and api_configuration.api_key is not empty %}
                             <p class="control">
-                                <button id="save" class="button is-danger" name="choice" value="purge_webhook">
+                                <button class="button is-danger" name="choice" value="purge-webhook">
                                     <span class="icon is-small">
                                         <i class="far fa-trash-alt"></i>
                                     </span>
@@ -179,7 +193,7 @@
     <br>
     <br>
     <div class="container">
-        <article class="message is-warning">
+        <article class="message is-info">
             <div class="message-header">
                 <p>Requirements</p>
             </div>
@@ -212,7 +226,7 @@
                                                 {% if requirement.0.custom_field in custom_fields.custom_fields %}
                                                     <option>{{ requirement.0.custom_field }}</option>
                                                 {% else %}
-                                                    <option></option>
+                                                    <option>Error !</option>
                                                 {% endif %}
                                                 {% for custom_field in custom_fields.custom_fields %}
                                                     {% if requirement.0.custom_field != custom_field %}
@@ -269,7 +283,7 @@
                                                 {% if requirement.1.custom_field in custom_fields.custom_fields %}
                                                     <option>{{ requirement.1.custom_field }}</option>
                                                 {% else %}
-                                                    <option></option>
+                                                    <option>Error !</option>
                                                 {% endif %}
                                                 {% for custom_field in custom_fields.custom_fields %}
                                                     {% if requirement.1.custom_field != custom_field %}
@@ -340,7 +354,7 @@
                                 </div>
                             </div>
                         </div>
-                        <button id="save" class="button is-success" name="choice" value="save-requirements">
+                        <button class="button is-success" name="choice" value="save-requirements">
                             <span class="icon is-small">
                                 <i class="fas fa-check"></i>
                             </span>

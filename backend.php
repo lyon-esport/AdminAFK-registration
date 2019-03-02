@@ -43,6 +43,8 @@ use \Project\Bdd;
 require_once 'class/Bdd.php';
 use \Project\Toornament;
 require_once 'class/Toornament.php';
+use \Project\ManageRegistration;
+require_once 'class/ManageRegistration.php';
 
 require_once 'functions/csrf.php';
 require_once 'functions/messages.php';
@@ -62,7 +64,11 @@ catch (Exception $e)
 
 if(isset($_POST['choice']) && !empty($_POST['choice']))
 {
-    if($_POST['choice'] === "save-api_configuration")
+    if($_POST['choice'] === "check-registration")
+    {
+        check_registration($BDD, $TOORNAMENT);
+    }
+    elseif ($_POST['choice'] === "save-api_configuration")
     {
         save_apiConfiguration($BDD, $TOORNAMENT);
     }
@@ -70,7 +76,7 @@ if(isset($_POST['choice']) && !empty($_POST['choice']))
     {
         save_requirement($BDD);
     }
-    elseif ($_POST['choice'] === "purge_webhook")
+    elseif ($_POST['choice'] === "purge-webhook")
     {
         purge_webhook($BDD, $TOORNAMENT);
     }
@@ -88,6 +94,71 @@ else
     die();
 }
 
+/**
+ * @param Bdd $BDD
+ * @param Toornament $TOORNAMENT
+ */
+function check_registration($BDD, $TOORNAMENT)
+{
+    try
+    {
+        $MANAGE_REGISTRATION = new ManageRegistration($TOORNAMENT->get_tournament_info()["body"], $BDD->get_requirement(), $BDD->get_setting());
+        $registrations = $TOORNAMENT->get_registration()["body"];
+
+        $pending_registration = false;
+        $nb_registrations = count($registrations);
+        $nb_accepted = 0;
+        $nb_refused = 0;
+        $nb_ignored = 0;
+
+        foreach($registrations as $registration)
+        {
+            if($registration->status === "pending")
+            {
+                $pending_registration = true;
+
+                $status = $MANAGE_REGISTRATION->status_registration($registration);
+
+                switch($status)
+                {
+                    case "accepted":
+                        $TOORNAMENT->patch_registration($registration->id, "accepted");
+                        $nb_accepted++;
+                        break;
+                    case "refused":
+                        $TOORNAMENT->patch_registration($registration->id, "refused");
+                        $nb_refused++;
+                        break;
+                    case "ignored":
+                        $nb_ignored++;
+                        break;
+                }
+            }
+        }
+        if($pending_registration)
+        {
+            create_message([['title' => 'Success !', 'content' => $nb_registrations.' registrations : '.$nb_accepted.' accepted, '.$nb_refused.' refused, '.$nb_ignored.' ignored', 'color' => 'success', 'delete' => true, 'container' => true]]);
+        }
+        else
+        {
+            create_message([['title' => 'Error !', 'content' => 'No pending registration to manage', 'color' => 'error', 'delete' => true, 'container' => true]]);
+        }
+
+        header('Location: index.php');
+        die();
+    }
+    catch(Exception $e)
+    {
+        create_message([['title' => 'Error !', 'content' => $e->getMessage(), 'color' => 'error', 'delete' => true, 'container' => true]]);
+        header('Location: index.php');
+        die();
+    }
+}
+
+/**
+ * @param Bdd $BDD
+ * @param Toornament $TOORNAMENT
+ */
 function save_apiConfiguration($BDD, $TOORNAMENT)
 {
     if(!check_csrf('csrf_apiConfiguration'))
@@ -251,6 +322,9 @@ function save_apiConfiguration($BDD, $TOORNAMENT)
     die();
 }
 
+/**
+ * @param Bdd $BDD
+ */
 function save_requirement($BDD)
 {
     if(!check_csrf('csrf_requirement'))
@@ -400,6 +474,10 @@ function save_requirement($BDD)
     die();
 }
 
+/**
+ * @param Bdd $BDD
+ * @param Toornament $TOORNAMENT
+ */
 function purge_webhook($BDD, $TOORNAMENT)
 {
     try

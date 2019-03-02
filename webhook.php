@@ -42,9 +42,10 @@ use \Project\Bdd;
 require_once 'class/Bdd.php';
 use \Project\Toornament;
 require_once 'class/Toornament.php';
+use \Project\ManageRegistration;
+require_once 'class/ManageRegistration.php';
 
 require_once 'functions/log.php';
-require_once 'functions/check_player.php';
 
 try
 {
@@ -93,6 +94,8 @@ else if($_SERVER['REQUEST_METHOD'] === 'POST')
 
         $webhook = json_decode($POST_body);
 
+        $MANAGE_REGISTRATION = new ManageRegistration($TOORNAMENT->get_tournament_info()["body"], $BDD->get_requirement(), $BDD->get_setting());
+
         if(($webhook->name === "registration.created" || $webhook->name === "registration.info_updated") && $webhook->object_type === "registration" && $webhook->scope === "tournament")
         {
             $registration = $TOORNAMENT->get_registrationById($webhook->object_id)["body"];
@@ -102,83 +105,17 @@ else if($_SERVER['REQUEST_METHOD'] === 'POST')
             throw new Exception("Incorrect JSON registration");
         }
 
-        $tournament = $TOORNAMENT->get_tournament_info()["body"];
-        $requirements = $BDD->get_requirement();
-        $settings = $BDD->get_setting();
-
         if($registration->status === "pending")
         {
-            $match = $settings[0]["value"] === "Accept" ? "accepted" : "ignored";
-            $no_match = $settings[1]["value"] === "Refuse" ? "refused" : "ignored";
-
-            $check["age"] = (!empty($requirements[0]["value"]) && !empty($requirements[0]["match"]) && !empty($requirements[0]["custom_field"])) ? true : false;
-            $check["country"] = (!empty($requirements[1]["value"]) && !empty($requirements[1]["match"]) && !empty($requirements[1]["custom_field"])) ? true : false;
-
-            $age_match = ["number" => 0, "custom_field" => substr(explode(' ', $requirements[0]["custom_field"])[1], 1, -1), "status" => false];
-            $country_match = ["number" => 0, "custom_field" => substr(explode(' ', $requirements[1]["custom_field"])[1], 1, -1), "status" => false];
-
-            $all_check = true;
-
-            if($check["age"])
-            {
-                if ($age_match["custom_field"] === "team" || $age_match["custom_field"] === "player")
-                {
-                    $age_match["number"] += match_age($requirements[0], $registration, $tournament->scheduled_date_start, -1);
-                    $age_match["status"] = (intval($age_match["number"]) >= intval($requirements[0]["match"])) ? true : false;
-                }
-                else if ($age_match["custom_field"] === "team_player")
-                {
-                    for ($i = 0; $i < count($registration->lineup); $i++)
-                    {
-                        $age_match["number"] += match_age($requirements[0], $registration, $tournament->scheduled_date_start, $i);
-                        $age_match["status"] = (intval($age_match["number"]) >= intval($requirements[0]["match"])) ? true : false;
-                    }
-                }
-                else
-                {
-                    throw new Exception("custom_field type not found");
-                }
-            }
-            if($check["country"])
-            {
-                if ($country_match["custom_field"] === "team" || $country_match["custom_field"] === "player")
-                {
-                    $country_match["number"] += match_country($requirements[1], $registration, -1);
-                    $country_match["status"] = (intval($country_match["number"]) >= intval($requirements[1]["match"])) ? true : false;
-                }
-                else if ($country_match["custom_field"] === "team_player")
-                {
-                    for ($i = 0; $i < count($registration->lineup); $i++)
-                    {
-                        $country_match["number"] += match_country($requirements[1], $registration, $i);
-                        $country_match["status"] = (intval($country_match["number"]) >= intval($requirements[1]["match"])) ? true : false;
-                    }
-                }
-                else
-                {
-                    throw new Exception("custom_field type not found");
-                }
-            }
-
-            if($all_check)
-            {
-                $all_check = $check["age"] ? $age_match["status"] : true;
-            }
-
-            if($all_check)
-            {
-                $all_check = $check["country"] ? $country_match["status"] : true;
-            }
-
-            $status = $all_check ? $match : $no_match;
+            $status = $MANAGE_REGISTRATION->status_registration($registration);
 
             switch($status)
             {
                 case "accepted":
-                    $TOORNAMENT->patch_registration($webhook->object_id, "accepted");
+                    $TOORNAMENT->patch_registration($registration->id, "accepted");
                     break;
                 case "refused":
-                    $TOORNAMENT->patch_registration($webhook->object_id, "refused");
+                    $TOORNAMENT->patch_registration($registration->id, "refused");
                     break;
                 case "ignored":
                     break;

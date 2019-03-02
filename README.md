@@ -1,4 +1,4 @@
-The goal of this project is to accept/refuse/ignore registration who meets requirements on a tournament managed by Toornament.
+The goal of this project is to accept/refuse/ignore registrations who meets requirements on a tournament managed by Toornament.
 It works with toornament Webhook and registrations are managed instantly (If the Toornament servers can not contact the 
 webhook URL, the servers will try to send the data again during the next 24 hours).
 
@@ -32,6 +32,12 @@ webhook URL, the servers will try to send the data again during the next 24 hour
 - Toornament status : Display if Toornament API is available
 - API configurations : Display if API configurations are properly configured
 - Webhook : Display if your webhook, subscription are properly configured
+
+#### Manual check
+
+If you have registrations in pending because you forgot to update Toornament ID on the website before opening registration or
+Toornament servers are busy, a button will be available to force a manual check of all registrations 
+and will accept/refuse/ignore registrations who meets requirements.
 
 #### Toornament API configuration
 
