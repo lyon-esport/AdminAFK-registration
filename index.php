@@ -162,7 +162,7 @@ try
         {
             $accepted++;
         }
-        else
+        elseif($registration->status === "pending")
         {
             $pending++;
         }
