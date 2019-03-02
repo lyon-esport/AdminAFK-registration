@@ -52,8 +52,8 @@ require_once 'functions/messages.php';
 try
 {
     $BDD = new Bdd('');
-    $toornamentStatus = $BDD->get_toornament();
-    $TOORNAMENT = new Toornament($toornamentStatus);
+    $api_configuration = $BDD->get_toornament();
+    $TOORNAMENT = new Toornament($api_configuration);
 }
 catch (Exception $e)
 {
@@ -230,7 +230,7 @@ function save_apiConfiguration($BDD, $TOORNAMENT)
     try
     {
         $BDD->patch_toornament($fields["client_id"]["value"], $fields["client_secret"]["value"], $fields["api_key"]["value"], $fields["toornament_id"]["value"], $fields["webhook_name"]["value"], $fields["webhook_url"]["value"]);
-        $TOORNAMENT->setToornamentId($fields["toornament_id"]["value"]);
+        $TOORNAMENT->setToornamentConfiguration($fields["client_id"]["value"], $fields["client_secret"]["value"], $fields["api_key"]["value"], $fields["toornament_id"]["value"]);
     }
     catch(Exception $e)
     {

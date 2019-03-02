@@ -51,9 +51,9 @@ class Toornament
 
     public function __construct($toornamentInfo)
     {
-        $this->api_key = $toornamentInfo["api_key"];
         $this->client_id = $toornamentInfo["client_id"];
         $this->client_secret = $toornamentInfo["client_secret"];
+        $this->api_key = $toornamentInfo["api_key"];
         $this->toornament_id = $toornamentInfo["toornament_id"];
     }
 
@@ -300,8 +300,11 @@ class Toornament
         return array("body" => $body, "http_code" => $httpcode);
     }
 
-    public function setToornamentId($toornament_id = "")
+    public function setToornamentConfiguration($client_id = "", $client_secret = "", $api_key = "", $toornament_id = "")
     {
+        $this->client_id = $client_id;
+        $this->client_secret = $client_secret;
+        $this->api_key = $api_key;
         $this->toornament_id = $toornament_id;
     }
 
