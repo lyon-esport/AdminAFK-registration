@@ -106,7 +106,6 @@ function check_registration($BDD, $TOORNAMENT)
         $registrations = $TOORNAMENT->get_registration()["body"];
 
         $pending_registration = false;
-        $nb_registrations = count($registrations);
         $nb_accepted = 0;
         $nb_refused = 0;
         $nb_ignored = 0;
@@ -135,6 +134,9 @@ function check_registration($BDD, $TOORNAMENT)
                 }
             }
         }
+
+        $nb_registrations = $nb_accepted + $nb_refused + $nb_ignored;
+
         if($pending_registration)
         {
             create_message([['title' => 'Success !', 'content' => $nb_registrations.' registrations : '.$nb_accepted.' accepted, '.$nb_refused.' refused, '.$nb_ignored.' ignored', 'color' => 'success', 'delete' => true, 'container' => true]]);
