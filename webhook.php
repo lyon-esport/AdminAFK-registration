@@ -53,7 +53,7 @@ try
     $api_configuration = $BDD->get_toornament();
     $TOORNAMENT = new Toornament($api_configuration);
 }
-catch (Exception $e)
+catch (Throwable $e)
 {
     log_to_file($e->getMessage());
     die();
@@ -67,7 +67,7 @@ if(isset(getallheaders()['X-Webhook-Secret']))
         header('HTTP/1.1 200 OK');
         header('X-Webhook-Secret: '.getallheaders()['X-Webhook-Secret']);
     }
-    catch(Exception $e)
+    catch(Throwable $e)
     {
         log_to_file("GET : " . $e->getMessage());
         die();
@@ -124,7 +124,7 @@ else if($_SERVER['REQUEST_METHOD'] === 'POST')
             log_to_file("POST : ".$registration->name." -> ".$status);
         }
     }
-    catch(Exception $e)
+    catch(Throwable $e)
     {
         log_to_file("POST : " . $e->getMessage());
         die();

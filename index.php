@@ -57,7 +57,7 @@ try
     $setting = $BDD->get_setting();
     $TOORNAMENT = new Toornament($api_configuration);
 }
-catch (Exception $e)
+catch (Throwable $e)
 {
     echo "Error : " . $e->getMessage();
     die();
@@ -71,7 +71,7 @@ try
 {
     $status += ["toornament_status" => $TOORNAMENT->get_token('test')["http_code"]];
 }
-catch(Exception $e)
+catch(Throwable $e)
 {
     $status += ["toornament_status" => $e->getMessage()];
 }
@@ -112,7 +112,7 @@ try
 
     $status += ["api_configuration" => $toornamentWebhook["http_code"]];
 }
-catch(Exception $e)
+catch(Throwable $e)
 {
     $status += ["api_configuration" => $e->getMessage()];
 }
@@ -140,7 +140,7 @@ try
         "http_code" => $toornamentInfo["http_code"]
     ];
 }
-catch(Exception $e)
+catch(Throwable $e)
 {
     $info += ["http_code" => $e->getMessage()];
 }
@@ -174,7 +174,7 @@ try
         "pending" => $pending
     ];
 }
-catch(Exception $e)
+catch(Throwable $e)
 {
     $info += ["http_code" => $e->getMessage()];
 }
@@ -190,7 +190,7 @@ try
     }
     $custom_fields["http_code"] = $toornamentCustom_fields["http_code"];
 }
-catch(Exception $e)
+catch(Throwable $e)
 {
     $custom_fields += ["http_code" => $e->getMessage()];
 }

@@ -39,7 +39,7 @@
 
 namespace Project;
 
-use DateTime, DateTimeZone, DateInterval;
+use Exception, DateTime, DateTimeZone, DateInterval;
 
 class ManageRegistration
 {
@@ -123,8 +123,6 @@ class ManageRegistration
 
     private function match_age($registration, $key = -1)
     {
-        $tz = new DateTimeZone('Europe/Paris');
-
         $requirement = [
             "value" => $this->requirements[0]["value"],
             "custom_field" => [
@@ -133,24 +131,23 @@ class ManageRegistration
             ]
         ];
 
+        $tz = new DateTimeZone('Europe/Paris');
         $field = $requirement["custom_field"]["value"];
 
         if($requirement["custom_field"]["type"] === "player" || $requirement["custom_field"]["type"] === "team")
         {
-            if(intval(DateTime::createFromFormat('Y-m-d', $registration->custom_fields->$field, $tz)->diff((new DateTime($this->toornament->scheduled_date_start, $tz))->add(new DateInterval('P1D')))->y) >= intval($requirement["value"]))
-            {
-                return 1;
-            }
+            $match_age = intval(DateTime::createFromFormat('Y-m-d', $registration->custom_fields->$field)->setTimezone($tz)->diff((new DateTime($this->toornament->scheduled_date_start, $tz))->add(new DateInterval('P1D')))->y) >= intval($requirement["value"]);
         }
         elseif($requirement["custom_field"]["type"] === "team_player")
         {
-                if(intval(DateTime::createFromFormat('Y-m-d', $registration->lineup[$key]->custom_fields->$field, $tz)->diff((new DateTime($this->toornament->scheduled_date_start, $tz))->add(new DateInterval('P1D')))->y) >= intval($requirement["value"]))
-                {
-                    return 1;
-                }
+            $match_age = intval(DateTime::createFromFormat('Y-m-d', $registration->lineup[$key]->custom_fields->$field)->setTimezone($tz)->diff((new DateTime($this->toornament->scheduled_date_start, $tz))->add(new DateInterval('P1D')))->y) >= intval($requirement["value"]);
+        }
+        else
+        {
+            throw new Exception("Registration team/player type unknown");
         }
 
-        return 0;
+        return $match_age ? 1 : 0;
     }
 
     private function match_country($registration, $key = -1)
@@ -167,19 +164,17 @@ class ManageRegistration
 
         if($requirement["custom_field"]["type"] === "player" || $requirement["custom_field"]["type"] === "team")
         {
-            if(in_array(strtolower($registration->custom_fields->$field), $requirement["value"]))
-            {
-                return 1;
-            }
+            $match_country = in_array(strtolower($registration->custom_fields->$field), $requirement["value"]);
         }
         elseif($requirement["custom_field"]["type"] === "team_player")
         {
-            if(in_array(strtolower($registration->lineup[$key]->custom_fields->$field), $requirement["value"]))
-            {
-                return 1;
-            }
+            $match_country = in_array(strtolower($registration->lineup[$key]->custom_fields->$field), $requirement["value"]);
+        }
+        else
+        {
+            throw new Exception("Registration team/player type unknown");
         }
 
-        return 0;
+        return $match_country ? 1 : 0;
     }
 }

@@ -147,7 +147,7 @@ function check_registration($BDD, $TOORNAMENT)
         header('Location: index.php');
         die();
     }
-    catch(Exception $e)
+    catch(Throwable $e)
     {
         create_message([['title' => 'Error !', 'content' => $e->getMessage(), 'color' => 'error', 'delete' => true, 'container' => true]]);
         header('Location: index.php');
@@ -220,7 +220,7 @@ function save_apiConfiguration($BDD, $TOORNAMENT)
             }
         }
     }
-    catch(Exception $e)
+    catch(Throwable $e)
     {
         create_message([['title' => 'Error !', 'content' => $e->getMessage(), 'color' => 'error', 'delete' => true, 'container' => true]]);
         header('Location: index.php');
@@ -232,7 +232,7 @@ function save_apiConfiguration($BDD, $TOORNAMENT)
         $BDD->patch_toornament($fields["client_id"]["value"], $fields["client_secret"]["value"], $fields["api_key"]["value"], $fields["toornament_id"]["value"], $fields["webhook_name"]["value"], $fields["webhook_url"]["value"]);
         $TOORNAMENT->setToornamentConfiguration($fields["client_id"]["value"], $fields["client_secret"]["value"], $fields["api_key"]["value"], $fields["toornament_id"]["value"]);
     }
-    catch(Exception $e)
+    catch(Throwable $e)
     {
         create_message([['title' => 'Error !', 'content' => $e->getMessage(), 'color' => 'error', 'delete' => true, 'container' => true]]);
         header('Location: index.php');
@@ -270,7 +270,7 @@ function save_apiConfiguration($BDD, $TOORNAMENT)
             $webhook_id = $webhookCreated["body"]->id;
         }
     }
-    catch(Exception $e)
+    catch(Throwable $e)
     {
         create_message([['title' => 'Error !', 'content' => $e->getMessage()." Webhook failed", 'color' => 'error', 'delete' => true, 'container' => true]]);
         header('Location: index.php');
@@ -310,7 +310,7 @@ function save_apiConfiguration($BDD, $TOORNAMENT)
             $TOORNAMENT->post_subscription($webhook_id, "registration.info_updated", "tournament");
         }
     }
-    catch(Exception $e)
+    catch(Throwable $e)
     {
         create_message([['title' => 'Error !', 'content' => $e->getMessage()." Subscription failed", 'color' => 'error', 'delete' => true, 'container' => true]]);
         header('Location: index.php');
@@ -445,7 +445,7 @@ function save_requirement($BDD)
             throw new Exception("no_match is not filled");
         }
     }
-    catch(Exception $e)
+    catch(Throwable $e)
     {
         create_message([['title' => 'Error !', 'content' => 'An error occurred when processing your request', 'color' => 'error', 'delete' => true, 'container' => true]]);
         header('Location: index.php');
@@ -462,7 +462,7 @@ function save_requirement($BDD)
         $BDD->patch_setting("match", $match);
         $BDD->patch_setting("no_match", $no_match);
     }
-    catch(Exception $e)
+    catch(Throwable $e)
     {
         create_message([['title' => 'Error !', 'content' => 'An error occurred when processing your request', 'color' => 'error', 'delete' => true, 'container' => true]]);
         header('Location: index.php');
@@ -508,7 +508,7 @@ function purge_webhook($BDD, $TOORNAMENT)
             die();
         }
     }
-    catch(Exception $e)
+    catch(Throwable $e)
     {
         create_message([['title' => 'Error !', 'content' => $e->getMessage()." Webhook failed to delete", 'color' => 'error', 'delete' => true, 'container' => true]]);
         header('Location: index.php');
