@@ -4,8 +4,10 @@ webhook URL, the servers will try to send the data again during the next 24 hour
 
 # This tool uses :
 
-* [Toornament](https://www.toornament.com) (solution for organizers to run tournaments)
-* [Twig](https://twig.symfony.com/) (template engine)
+* [Toornament](https://www.toornament.com) - solution for organizers to run tournaments
+* [Twig](https://twig.symfony.com/) - template engine
+* [Bulma](https://bulma.io/) - CSS framework
+* [Font Awesome](https://fontawesome.com/) - Icon library
 
 # Requirements
 
