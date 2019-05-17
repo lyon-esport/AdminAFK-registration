@@ -10,6 +10,7 @@ webhook URL, the servers will try to send the data again during the next 24 hour
 * [Font Awesome](https://fontawesome.com/) - Icon library
 
 # Requirements
+#### Standard
 
 - PHP >= 7.0.0
 - Twig >= 2.0
@@ -19,13 +20,22 @@ webhook URL, the servers will try to send the data again during the next 24 hour
 
 - Toornament API Developper
 
+#### Docker
+- Docker
+
 # Get your API key
 
 * [Toornament API](https://developer.toornament.com/v2/overview/get-started?_locale=en)
 
 # Install
+#### Standard
 
 - Open your browser and setup the database by going on `setup.php`
+
+#### Docker
+1. Download `Dockerfile` file
+2. Build the container `docker build -t adminafk-registration .`
+3. Start the container `docker run adminafk-registration`
 
 # Usage guide
 
