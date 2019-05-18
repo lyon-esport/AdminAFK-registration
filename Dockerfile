@@ -49,7 +49,7 @@ RUN apt-get -y install git \
 					   unzip
 
 # download adminafk-registration project
-RUN git clone https://github.com/M0NsTeRRR/AdminAFK-registration.git
+RUN git clone https://github.com/lyon-esport/AdminAFK-registration.git
 
 # copy file to /app/
 RUN mkdir -p /app/AdminAFK-registration/ && mv AdminAFK-registration/* /app/AdminAFK-registration/
