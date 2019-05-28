@@ -1,0 +1,24 @@
+{
+    "name": "lyon-esport/adminafk-registration",
+    "description": "The goal of this project is to accept/refuse/ignore registration who meets requirements on a tournament managed by Toornament.",
+    "homepage": "https://github.com/lyon-esport/AdminAFK-registration",
+    "license": "CeCILL v2.1",
+    "authors": [
+        {
+            "name": "Ludovic Ortega",
+            "email": "ludovic.ortega@lyon-esport.fr",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "wiki": "https://github.com/lyon-esport/AdminAFK-registration",
+        "issues": "https://github.com/lyon-esport/AdminAFK-registration/issues",
+        "source": "https://github.com/lyon-esport/AdminAFK-registration"
+    },
+    "require": {
+    	"php": "^7.0",
+    	"ext-pdo": "*",
+        "ext-curl": "*",
+        "twig/twig": "^2.0"
+    }
+}
