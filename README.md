@@ -1,3 +1,6 @@
+![Docker Automated build](https://img.shields.io/docker/cloud/automated/lyonesport/adminafk-registration?style=flat-square)
+![Docker Build Status](https://img.shields.io/docker/cloud/build/lyonesport/adminafk-registration?style=flat-square)
+
 The goal of this project is to accept/refuse/ignore registrations who meets requirements on a tournament managed by Toornament.
 It works with toornament Webhook and registrations are managed instantly (If the Toornament servers can not contact the 
 webhook URL, the servers will try to send the data again during the next 24 hours).
@@ -33,9 +36,7 @@ webhook URL, the servers will try to send the data again during the next 24 hour
 - Open your browser and setup the database by going on `setup.php`
 
 #### Docker
-1. Download `Dockerfile` file
-2. Build the container `docker build -t adminafk-registration .`
-3. Start the container `docker run adminafk-registration`
+Start the container `docker run -d --restart=always -p 8080:80 lyonesport/adminafk-registration:latest`
 
 # Usage guide
 
