@@ -1,5 +1,5 @@
-![Docker Automated build](https://img.shields.io/docker/cloud/automated/lyonesport/adminafk-registration?style=flat-square)
-![Docker Build Status](https://img.shields.io/docker/cloud/build/lyonesport/adminafk-registration?style=flat-square)
+[![Docker Automated build](https://img.shields.io/docker/cloud/automated/lyonesport/adminafk-registration?style=flat-square)](https://hub.docker.com/r/lyonesport/adminafk-registration)
+[![Docker Build Status](https://img.shields.io/docker/cloud/build/lyonesport/adminafk-registration?style=flat-square)](https://hub.docker.com/r/lyonesport/adminafk-registration)
 
 The goal of this project is to accept/refuse/ignore registrations who meets requirements on a tournament managed by Toornament.
 It works with toornament Webhook and registrations are managed instantly (If the Toornament servers can not contact the 
