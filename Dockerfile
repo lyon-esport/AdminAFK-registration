@@ -35,5 +35,11 @@ RUN apt-get -y install curl
 # set workdir
 WORKDIR /var/www/html/
 
+# set user to own database
+USER www-data
+
 # create database
 RUN php -f setup.php
+
+# set user to start apache
+USER root
