@@ -10,7 +10,7 @@ RUN apt-get -y install zip \
 					   unzip
 
 # copy file to /app/AdminAFK-registration/
-COPY * /app/AdminAFK-registration/
+COPY . /app/AdminAFK-registration/
 
 # install composer
 RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer
