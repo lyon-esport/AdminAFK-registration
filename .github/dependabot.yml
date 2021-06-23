@@ -8,3 +8,11 @@ updates:
   open-pull-requests-limit: 10
   assignees:
   - M0NsTeRRR
+# Check github actions are up to date.
+- package-ecosystem: "github-actions"
+  directory: "/"
+  schedule:
+    interval: "daily"
+    time: "04:00"
+  assignees:
+  - M0NsTeRRR
