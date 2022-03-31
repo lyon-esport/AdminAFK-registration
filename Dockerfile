@@ -18,7 +18,7 @@ RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/lo
 # install dependencies
 RUN cd /app/AdminAFK-registration/ && composer require "twig/twig:^2.0" --no-plugins
 
-FROM php:7.3.32-apache
+FROM php:7.4.28-apache
 
 # clean html directory
 RUN rm -Rf /var/www/html/*
